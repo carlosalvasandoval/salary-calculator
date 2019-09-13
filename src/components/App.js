@@ -1,5 +1,6 @@
 import React from 'react';
 import '../sass/App.scss';
+import { switchCase } from '@babel/types';
 const UIT = 4200;
 const DEDUCCION = 7 * UIT;
 class App extends React.Component {
@@ -8,11 +9,30 @@ class App extends React.Component {
     super(args);
     this.state = {
       salario_bruto_anual: '',
-      ingreso_neto:''
+      ingreso_neto: ''
     }
   }
+  calcularTasaImpuesto = (remuneracionNetaAnual) => {
+
+    switch (true) {
+      case remuneracionNetaAnual <= 5 * UIT:
+        return 0.05;
+      case remuneracionNetaAnual > 5 * UIT && remuneracionNetaAnual <= 20 * UIT:
+        return 0.14;
+      case remuneracionNetaAnual > 20 * UIT && remuneracionNetaAnual <= 35 * UIT:
+        return 0.17;
+      case remuneracionNetaAnual > 35 * UIT && remuneracionNetaAnual <= 45 * UIT:
+        return 0.20;
+      case remuneracionNetaAnual > 45:
+        return 0.30;
+      default:
+        return 0;
+    }
+
+  }
   calcularIngresoNeto = () => {
-    console.log(getRemuneracionNetaAnual(this.state.salario_bruto_anual));
+    let remuneracionNetaAnual = getRemuneracionNetaAnual(this.state.salario_bruto_anual);
+    let impuestoAnualProyectado = remuneracionNetaAnual * this.calcularTasaImpuesto(remuneracionNetaAnual);
   };
 
   onChange(e) {
@@ -20,7 +40,7 @@ class App extends React.Component {
       [e.target.name]: e.target.value
     });
   }
-  
+
   render() {
     return (
       <div className="container">
@@ -28,7 +48,7 @@ class App extends React.Component {
         <div className="form-group">
           <label>Ingreso bruto Anual</label>
           <input
-            type="numeric"
+            type="number" step="any"
             className="form-control"
             placeholder="Salario bruto anual"
             value={this.state.salario_bruto_anual}
@@ -45,14 +65,13 @@ class App extends React.Component {
           <input type="checkbox" className="form-check-input" />
           <label className="form-check-label">Check me out</label>
         </div>
-        <button type="submit" className="btn btn-primary" >
-          Calcular</button>
+        <button type="submit" className="btn btn-primary" onClick={this.calcularIngresoNeto} > Calcular</button>
         {JSON.stringify(this.state)}
       </div>
     );
   }
 }
-const getRemuneracionNetaAnual = (salario) => salario - DEDUCCION;
+const getRemuneracionNetaAnual = (salarioBrutoAnual) => salarioBrutoAnual - DEDUCCION;
 
 
 export default App;
